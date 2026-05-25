@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+build/
+dist/
+*.egg-info/
+
+.env
+venv/
+
+.ipynb_checkpoints/
+
+evaluation/results/*.json
