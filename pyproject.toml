@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mathtok"
+version = "0.1.0"
+description = "Mathematical symbolic tokenizer framework for LLM reasoning"
+readme = "README.md"
+requires-python = ">=3.9"
+
+authors = [
+  { name="Surweesh SP" }
+]
