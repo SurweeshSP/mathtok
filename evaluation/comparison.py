@@ -65,77 +65,43 @@ logger = logging.getLogger(__name__)
 _RESULTS_DIR = Path(__file__).parent / "results"
 
 
-# ── Test suites ───────────────────────────────────────────────────────────
+_DATA_DIR = Path(__file__).parent / "datasets"
+_UNIFIED_FILE = _DATA_DIR / "unified_dataset.json"
 
-STANDARD_EXPRESSIONS = [
-    "(x+1)^2",
-    "sin(x^2) + 3*x",
-    "x^2 + 2*x + 1",
-    "exp(-x^2/2)",
-    "1/(1 + exp(-x))",
-    "log(x*y)",
-    "sqrt(a^2 + b^2)",
-    "n*(n+1)/2",
-    "factorial(n)",
-    "diff(sin(x), x)",
-    "integrate(x^2, x)",
-    "limit(sin(x)/x, x, 0)",
-    "a^2 - b^2",
-    "(-b + sqrt(b^2 - 4*a*c)) / (2*a)",
-    "sum(k^2, k, 1, n)",
-]
+if _UNIFIED_FILE.exists():
+    with open(_UNIFIED_FILE, "r", encoding="utf-8") as f:
+        _unified_data = json.load(f)
+else:
+    _unified_data = {}
 
-DEEP_NESTING_EXPRESSIONS = [
-    "sin(cos(x^2 + 1))",
-    "sin(cos((x+1)^2 + y^3))",
-    "exp(log(sin(x^2 + cos(y))))",
-    "sqrt(1 + sqrt(1 + sqrt(x)))",
-    "log(1 + log(1 + x))",
-    "((x+1)^2 + (y-1)^2)^3",
-    "((a + b)*(a - b)) / ((a + b)^2)",
-]
+UNIFIED_EXPRESSIONS = _unified_data.get("expressions", [])
+CANONICAL_PAIRS = _unified_data.get("equivalent_pairs", [])
+MIXED_TEXT_MATH = _unified_data.get("mixed_text_math", [])
 
-ODE_PDE_EXPRESSIONS = [
-    "Derivative(f(x), x, 2) + 2*Derivative(f(x), x) + f(x)",
-    "Derivative(u(x, t), t) - alpha * Derivative(u(x, t), x, 2)",
-]
+# Fallbacks if the unified dataset doesn't have them
+if not CANONICAL_PAIRS:
+    CANONICAL_PAIRS = [
+        ("x + 2",            "2 + x"),
+        ("a*b + a*c",        "a*(b+c)"),
+        ("(x+1)^2",          "x^2 + 2*x + 1"),
+        ("x^2 - y^2",        "(x+y)*(x-y)"),
+        ("sin(x)^2 + cos(x)^2", "1"),
+        ("2*x + 2*y",        "2*(x+y)"),
+        ("x*y + x*z",        "x*(y+z)"),
+        ("a^2 + 2*a*b + b^2","(a+b)^2"),
+    ]
 
-MATRIX_LINEAR_ALGEBRA = [
-    "A*x + b",
-    "det(A - lambda*I)",
-]
-
-PROBABILITY_EXPRESSIONS = [
-    "P(A|B) * P(B) / P(A)",
-    "exp(-x^2 / 2) / sqrt(2*pi)",
-]
-
-SET_THEORY = [
-    "Union(A, B)",
-    "Intersection(A, B)",
-]
-
-CANONICAL_PAIRS = [
-    ("x + 2",            "2 + x"),
-    ("a*b + a*c",        "a*(b+c)"),
-    ("(x+1)^2",          "x^2 + 2*x + 1"),
-    ("x^2 - y^2",        "(x+y)*(x-y)"),
-    ("sin(x)^2 + cos(x)^2", "1"),
-    ("2*x + 2*y",        "2*(x+y)"),
-    ("x*y + x*z",        "x*(y+z)"),
-    ("a^2 + 2*a*b + b^2","(a+b)^2"),
-]
-
-MIXED_TEXT_MATH = [
-    "The derivative of sin(x^2) with respect to x.",
-    "Solve for x when x^2 + 2*x + 1 = 0.",
-    "The quadratic formula gives $x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$.",
-    "For $n \\geq 1$, the sum $\\sum_{k=1}^{n} k = \\frac{n(n+1)}{2}$.",
-    "Integrate $\\int_0^1 x^2 dx$ to get $\\frac{1}{3}$.",
-    "If $a > 0$ and $b > 0$ then $\\log(a) + \\log(b) = \\log(ab)$.",
-    "The area of a circle of radius r is pi*r^2.",
-    "Euler's identity: $e^{i\\pi} + 1 = 0$.",
-]
+if not MIXED_TEXT_MATH:
+    MIXED_TEXT_MATH = [
+        "The derivative of sin(x^2) with respect to x.",
+        "Solve for x when x^2 + 2*x + 1 = 0.",
+        "The quadratic formula gives $x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$.",
+        "For $n \\geq 1$, the sum $\\sum_{k=1}^{n} k = \\frac{n(n+1)}{2}$.",
+        "Integrate $\\int_0^1 x^2 dx$ to get $\\frac{1}{3}$.",
+        "If $a > 0$ and $b > 0$ then $\\log(a) + \\log(b) = \\log(ab)$.",
+        "The area of a circle of radius r is pi*r^2.",
+        "Euler's identity: $e^{i\\pi} + 1 = 0$.",
+    ]
 
 LATEX_ASCII_PAIRS = [
     ("sin(x^2)",         "\\sin(x^2)"),
@@ -148,6 +114,19 @@ LATEX_ASCII_PAIRS = [
     ("factorial(n)",     "n!"),
 ]
 
+
+
+from .metrics import (
+    EvaluationReport, MetricResult,
+    structural_compression_ratio,
+    canonical_consistency_score,
+    operator_preservation_score,
+    token_stability,
+    tree_depth_fidelity,
+    make_gpt2_tokenizer,
+    tokenize_character_level,
+    compute_structural_information
+)
 
 # ── Result dataclasses ────────────────────────────────────────────────────
 
@@ -169,24 +148,22 @@ class TokenizerStats:
     structural_score:      float = 0.0
     raw_scr:               float = 0.0   # structural_score / token_count
     semantic_density:      float = 0.0   # math tokens / total tokens
-    structural_efficiency: float = 0.0   # parent_child_relations / token_count
+    structural_efficiency: float = 0.0   # SI(E) / Token Count (identical to raw_scr)
 
-    def compute_scr(self) -> None:
-        self.structural_score = (
-            self.operator_nodes
-            + self.tree_depth
-            + self.parent_child_relations
-            + self.function_scope
-            + self.canonical_bonus
+    def compute_scr(self, alpha=1.0, beta=1.0, gamma=1.0, delta=1.0, epsilon=1.0) -> None:
+        self.structural_score = compute_structural_information(
+            operator_nodes=self.operator_nodes,
+            tree_depth=self.tree_depth,
+            parent_child_relations=self.parent_child_relations,
+            function_scope=self.function_scope,
+            canonical_bonus=self.canonical_bonus,
+            alpha=alpha, beta=beta, gamma=gamma, delta=delta, epsilon=epsilon
         )
         self.raw_scr = (
             self.structural_score / self.token_count
             if self.token_count > 0 else 0.0
         )
-        self.structural_efficiency = (
-            self.parent_child_relations / self.token_count
-            if self.token_count > 0 else 0.0
-        )
+        self.structural_efficiency = self.raw_scr
 
     def to_dict(self) -> dict:
         d = asdict(self)
@@ -223,6 +200,24 @@ class ComparisonRecord:
         if self.char_level.raw_scr == 0:
             return 0.0
         return self.mathtok.raw_scr / self.char_level.raw_scr
+        
+    @property
+    def tdr_vs_gpt2(self) -> Optional[float]:
+        if self.gpt2 is None or self.gpt2.token_count == 0:
+            return None
+        return self.mathtok.token_count / self.gpt2.token_count
+        
+    @property
+    def tdr_vs_sp(self) -> Optional[float]:
+        if self.sentencepiece is None or self.sentencepiece.token_count == 0:
+            return None
+        return self.mathtok.token_count / self.sentencepiece.token_count
+
+    @property
+    def tdr_vs_char(self) -> float:
+        if self.char_level.token_count == 0:
+            return 0.0
+        return self.mathtok.token_count / self.char_level.token_count
 
     def to_dict(self) -> dict:
         return {
@@ -236,6 +231,9 @@ class ComparisonRecord:
             "scr_improvement_vs_gpt2": self.scr_improvement_vs_gpt2,
             "scr_improvement_vs_sp":   self.scr_improvement_vs_sp,
             "scr_improvement_vs_char": self.scr_improvement_vs_char,
+            "tdr_vs_gpt2":            self.tdr_vs_gpt2,
+            "tdr_vs_sp":              self.tdr_vs_sp,
+            "tdr_vs_char":            self.tdr_vs_char,
             "notes":                  self.notes,
         }
 
@@ -431,13 +429,9 @@ def _get_trained_sp_tokenizer() -> Optional[Callable[[str], list[str]]]:
         
         # Collect all expressions from our suites to form a corpus
         corpus = []
-        corpus.extend(STANDARD_EXPRESSIONS)
-        corpus.extend(DEEP_NESTING_EXPRESSIONS)
-        corpus.extend(ODE_PDE_EXPRESSIONS)
-        corpus.extend(MATRIX_LINEAR_ALGEBRA)
-        corpus.extend(PROBABILITY_EXPRESSIONS)
-        corpus.extend(SET_THEORY)
+        corpus.extend(UNIFIED_EXPRESSIONS)
         for a, b in CANONICAL_PAIRS:
+
             corpus.extend([a, b])
         corpus.extend(MIXED_TEXT_MATH)
         for a, b in LATEX_ASCII_PAIRS:
@@ -510,12 +504,8 @@ class TokenizerComparison:
         print("  MathTok Semantic Tokenizer Comparison")
         print("=" * 80)
 
-        self._run_category("standard",    STANDARD_EXPRESSIONS)
-        self._run_category("deep_nesting", DEEP_NESTING_EXPRESSIONS)
-        self._run_category("ode_pde", ODE_PDE_EXPRESSIONS)
-        self._run_category("linear_algebra", MATRIX_LINEAR_ALGEBRA)
-        self._run_category("probability", PROBABILITY_EXPRESSIONS)
-        self._run_category("set_theory", SET_THEORY)
+        self._run_category("unified", UNIFIED_EXPRESSIONS)
+
         self._run_canonical_equivalence()
         self._run_mixed_text_math()
         self._run_latex_vs_ascii()
@@ -529,12 +519,8 @@ class TokenizerComparison:
     def run_category(self, category: str) -> list[ComparisonRecord]:
         """Run a single named category."""
         categories = {
-            "standard":    (self._run_category, ("standard",    STANDARD_EXPRESSIONS)),
-            "deep":        (self._run_category, ("deep_nesting", DEEP_NESTING_EXPRESSIONS)),
-            "ode_pde":     (self._run_category, ("ode_pde", ODE_PDE_EXPRESSIONS)),
-            "linear":      (self._run_category, ("linear_algebra", MATRIX_LINEAR_ALGEBRA)),
-            "probability": (self._run_category, ("probability", PROBABILITY_EXPRESSIONS)),
-            "set_theory":  (self._run_category, ("set_theory", SET_THEORY)),
+            "unified":     (self._run_category, ("unified", UNIFIED_EXPRESSIONS)),
+
             "canonical":   (self._run_canonical_equivalence, ()),
             "mixed":       (self._run_mixed_text_math, ()),
             "latex_ascii": (self._run_latex_vs_ascii, ()),

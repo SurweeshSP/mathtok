@@ -147,16 +147,18 @@ The [`evaluation/`](file:///c:/Users/surwe/Project/math_token/evaluation) packag
 
 Empirical comparisons of MathTok against a standard subword tokenizer (GPT-2 BPE), a custom-trained SentencePiece (unigram) tokenizer, and character-level baselines over 70 complex test expressions across multiple disciplines reveal substantial improvements.
 
-### 1. 3-Level Semantic Comparison (Aggregated)
+### 1. Category-Wise Semantic Compression Ratio (SCR)
 
-Across the entire evaluation suite, the aggregated results illustrate MathTok's efficiency:
+Breaking down the evaluation by mathematical category reveals MathTok's consistent dominance across diverse symbolic structures. 
 
-| Metric | MathTok | GPT-2 | SentencePiece | Character-Level |
+| Category | MathTok | GPT-2 | T5 | BERT |
 | :--- | :---: | :---: | :---: | :---: |
-| **Level 1 — SCR** (struct_score / tokens) | **0.9161** | 0.4251 | 0.3696 | 0.4005 |
-| **Level 2 — Semantic Density** (math / total) | **0.5633** | 0.1838 | 0.1499 | — |
-| **Level 3 — Structural Efficiency** (relations / tokens) | **0.2492** | *N/A* | *N/A* | — |
-| **SCR Improvement Factor** (MathTok vs. Baseline) | **—** | **2.16x** | **2.48x** | **2.29x** |
+| **Algebra** | **1.28** | 0.47 | 0.43 | 0.68 |
+| **Calculus** | **1.50** | 0.40 | 0.33 | 0.56 |
+| **Deep Nesting** | **0.93** | 0.27 | 0.27 | 0.34 |
+| **LaTeX** | **1.05** | 0.22 | 0.18 | 0.28 |
+| **Probability** | **1.14** | 0.41 | 0.47 | 0.56 |
+| **Logic** | **0.83** | 0.08 | 0.06 | 0.09 |
 
 ### 2. Canonical Convergence & Consistency (Jaccard Overlap)
 

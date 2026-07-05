@@ -1,0 +1,9 @@
+{
+  "tokenizer_class": "MathTokHFTokenizer",
+  "model_max_length": 2048,
+  "pad_token": "[PAD]",
+  "unk_token": "[UNK]",
+  "bos_token": "[BOS]",
+  "eos_token": "[EOS]",
+  "mask_token": "[MASK]"
+}

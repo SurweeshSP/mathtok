@@ -76,38 +76,56 @@ class EvaluationReport:
         }
 
 
-# ── Metric 1: Structural Compression Ratio (SCR) ─────────────────────────
+# ── Metric 1: Structural Information (SI) & Canonical SCR ────────────────
+
+def compute_structural_information(
+    operator_nodes: int,
+    tree_depth: int,
+    parent_child_relations: int,
+    function_scope: int,
+    canonical_bonus: int,
+    alpha: float = 1.0,
+    beta: float = 1.0,
+    gamma: float = 1.0,
+    delta: float = 1.0,
+    epsilon: float = 1.0,
+) -> float:
+    """
+    Computes SI(E) = alpha*O + beta*log(1+D) + gamma*R + delta*F + epsilon*C
+    """
+    return (
+        alpha * operator_nodes
+        + beta * math.log1p(tree_depth)
+        + gamma * parent_child_relations
+        + delta * function_scope
+        + epsilon * canonical_bonus
+    )
+
 
 def structural_compression_ratio(
-    expressions: list[str],
-    tokenized_lengths: list[int],
+    si_values: list[float],
+    token_counts: list[int],
 ) -> MetricResult:
     """
-    SCR = mean( |AST_tokens| / |raw_chars| )
+    SCR = SI(E) / |T(E)|
 
     Measures how efficiently the structural token stream represents the
-    information content relative to raw character count.
-    Lower SCR = more compressed.  A ratio < 1.0 indicates compression.
-
-    Parameters
-    ----------
-    expressions       : list of raw input expression strings
-    tokenized_lengths : list of token counts output by MathTok
+    information content relative to the token count.
+    Higher SCR = denser structural information per token.
     """
-    assert len(expressions) == len(tokenized_lengths), "Length mismatch"
+    assert len(si_values) == len(token_counts), "Length mismatch"
     ratios = []
-    for expr, tlen in zip(expressions, tokenized_lengths):
-        char_len = max(len(expr), 1)
-        ratios.append(tlen / char_len)
+    for si, tc in zip(si_values, token_counts):
+        ratios.append(si / tc if tc > 0 else 0.0)
 
-    mean_scr = sum(ratios) / len(ratios)
+    mean_scr = sum(ratios) / len(ratios) if ratios else 0.0
     return MetricResult(
         name="SCR",
         value=mean_scr,
-        description="Structural Compression Ratio (tokens / chars); lower = more compressed",
+        description="Structural Compression Ratio (SI / tokens); higher = denser",
         details={
-            "min": min(ratios),
-            "max": max(ratios),
+            "min": min(ratios) if ratios else 0,
+            "max": max(ratios) if ratios else 0,
             "std": _std(ratios),
             "n":   len(ratios),
         },
@@ -121,41 +139,41 @@ def canonical_consistency_score(
     tokenize_fn: Callable[[str], list[str]],
 ) -> MetricResult:
     """
-    CCS = mean( Jaccard(tokens_A, tokens_B) )  over equivalent pairs.
+    CCS = Equivalent forms mapped identically / Total equivalent forms
 
-    Measures how similar the token streams are for mathematically
-    equivalent expressions.  CCS → 1.0 means perfect consistency.
+    Measures the fraction of mathematically equivalent expressions that are
+    tokenized into identically identical sets of tokens (excluding boundary tokens).
+    CCS -> 1.0 means perfect consistency.
 
     Parameters
     ----------
     equivalent_pairs : list of (expr_A, expr_B) that are mathematically equal
     tokenize_fn      : function str → list[str] (the tokenizer under test)
     """
-    scores = []
+    identical_count = 0
+    total = len(equivalent_pairs)
+    
     for expr_a, expr_b in equivalent_pairs:
         try:
             toks_a = set(tokenize_fn(expr_a))
             toks_b = set(tokenize_fn(expr_b))
-            # Remove boundary tokens from Jaccard
-            toks_a = {t for t in toks_a if not t.startswith("[")  }
-            toks_b = {t for t in toks_b if not t.startswith("[")  }
-            if not toks_a and not toks_b:
-                scores.append(1.0)
-            else:
-                intersection = len(toks_a & toks_b)
-                union        = len(toks_a | toks_b)
-                scores.append(intersection / union if union > 0 else 0.0)
+            # Remove boundary tokens
+            toks_a = {t for t in toks_a if not t.startswith("[")}
+            toks_b = {t for t in toks_b if not t.startswith("[")}
+            
+            if toks_a == toks_b:
+                identical_count += 1
         except Exception as exc:
             logger.debug("CCS: failed on pair (%s, %s): %s", expr_a[:30], expr_b[:30], exc)
-            scores.append(0.0)
 
-    mean_ccs = sum(scores) / len(scores) if scores else 0.0
+    ccs_value = identical_count / total if total > 0 else 0.0
     return MetricResult(
         name="CCS",
-        value=mean_ccs,
-        description="Canonical Consistency Score — Jaccard overlap for equivalent forms (higher is better)",
-        details={"scores": scores[:20], "n": len(scores), "std": _std(scores)},
+        value=ccs_value,
+        description="Canonical Consistency Score — Fraction of equivalent forms mapped identically",
+        details={"identical_count": identical_count, "total": total},
     )
+
 
 
 # ── Metric 3: Operator Preservation Score (OPS) ──────────────────────────

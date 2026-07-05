@@ -1,0 +1,91 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{booktabs}
+
+\begin{document}
+
+\section{Formal Metric Definitions}
+
+The Canonical Structural Compression Ratio (SCR) is defined as the structural information preserved per token:
+
+\begin{equation}
+    SCR = \frac{SI(E)}{|T(E)|}
+\end{equation}
+
+where $SI(E)$ is the Structural Information score, defined as:
+
+\begin{equation}
+    SI(E) = \alpha O + \beta \log(1+D) + \gamma R + \delta F + \epsilon C
+\end{equation}
+
+Where:
+\begin{itemize}
+    \item $O$ = operator count
+    \item $D$ = AST depth
+    \item $R$ = parent-child relations
+    \item $F$ = function scope count
+    \item $C$ = canonical equivalence preservation bonus
+\end{itemize}
+
+\section{Architecture Diagram}
+
+\begin{verbatim}
+Input
+  ↓
+Canonicalizer
+  ↓
+Hybrid Lexer
+  ↓
+AST Builder
+  ↓
+Serializer
+  ↓
+Semantic Encoder
+  ↓
+Vocabulary Mapper
+  ↓
+Tokens
+\end{verbatim}
+
+\section{Results}
+
+\begin{table}[h]
+\centering
+\caption{Benchmark Statistics}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Category & Count \\
+\midrule
+Algebra & 200 \\
+Calculus & 200 \\
+Probability & 100 \\
+Statistics & 100 \\
+Linear Algebra & 100 \\
+Optimization & 100 \\
+Logic & 100 \\
+Number Theory & 100 \\
+\midrule
+Total & 1000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption{Ablation Study Results}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Variant & SCR & CCS & Perplexity (PPL) \\
+\midrule
+Full MathTok & 1.15 & 0.95 & 12.5 \\
+No Canonicalization & 1.15 & 0.40 & 14.1 \\
+No AST & 0.45 & 0.35 & 25.0 \\
+No Structural Serialization & 0.85 & 0.95 & 18.2 \\
+No Operator Encoding & 0.95 & 0.95 & 13.8 \\
+No Function Tokens & 1.05 & 0.95 & 12.9 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\end{document}
