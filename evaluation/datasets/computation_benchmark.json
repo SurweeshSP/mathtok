@@ -1,0 +1,456 @@
+{
+  "benchmark_version": "2.0",
+  "metadata": {
+    "description": "Comprehensive Mathematical Computation and Validation Benchmark",
+    "total_problems": 45,
+    "categories_count": 9,
+    "tolerances": {
+      "abs_tol": 1e-5,
+      "rel_tol": 1e-4
+    }
+  },
+  "categories": [
+    "Arithmetic",
+    "Algebra",
+    "Equations",
+    "Calculus",
+    "Trigonometry",
+    "Logarithms_and_exponentials",
+    "Matrices",
+    "Probability",
+    "LaTeX_ASCII_equivalence"
+  ],
+  "problems": [
+    {
+      "id": "arith_01",
+      "category": "Arithmetic",
+      "family_id": "arith_frac_add",
+      "problem": "Evaluate the exact rational sum: 3/7 + 5/14",
+      "reference": "11/14",
+      "problem_type": "exact",
+      "difficulty": "straightforward"
+    },
+    {
+      "id": "arith_02",
+      "category": "Arithmetic",
+      "family_id": "arith_order_ops",
+      "problem": "Compute the exact value of: (-2)^3 * (5 - 8) / (4 - 2)",
+      "reference": "12",
+      "problem_type": "exact",
+      "difficulty": "straightforward"
+    },
+    {
+      "id": "arith_03",
+      "category": "Arithmetic",
+      "family_id": "arith_nested_powers",
+      "problem": "Compute: (2^(1/2) * 8^(1/2)) / 4",
+      "reference": "1",
+      "problem_type": "exact",
+      "difficulty": "challenging"
+    },
+    {
+      "id": "arith_04",
+      "category": "Arithmetic",
+      "family_id": "arith_frac_complex",
+      "problem": "Evaluate the complex fraction: (1/2 - 1/3) / (1/4 + 1/6)",
+      "reference": "2/5",
+      "problem_type": "exact",
+      "difficulty": "challenging"
+    },
+    {
+      "id": "arith_05",
+      "category": "Arithmetic",
+      "family_id": "arith_root_diff",
+      "problem": "Simplify: sqrt(50) - sqrt(18)",
+      "reference": "2*sqrt(2)",
+      "problem_type": "symbolic",
+      "difficulty": "challenging"
+    },
+
+    {
+      "id": "alg_01",
+      "category": "Algebra",
+      "family_id": "alg_expansion_sq",
+      "problem": "Expand the polynomial: (2*x - 3)^2",
+      "reference": "4*x^2 - 12*x + 9",
+      "problem_type": "symbolic",
+      "difficulty": "straightforward"
+    },
+    {
+      "id": "alg_02",
+      "category": "Algebra",
+      "family_id": "alg_factorization_cubes",
+      "problem": "Factorize the difference of cubes: x^3 - 8",
+      "reference": "(x - 2)*(x^2 + 2*x + 4)",
+      "problem_type": "symbolic",
+      "difficulty": "straightforward"
+    },
+    {
+      "id": "alg_03",
+      "category": "Algebra",
+      "family_id": "alg_rational_simplify",
+      "problem": "Simplify the rational expression: (x^2 - 9) / (x + 3)",
+      "reference": "x - 3",
+      "problem_type": "symbolic",
+      "difficulty": "straightforward"
+    },
+    {
+      "id": "alg_04",
+      "category": "Algebra",
+      "family_id": "alg_polynomial_poly_diff",
+      "problem": "Simplify: (x + 1)^3 - (x - 1)^3",
+      "reference": "6*x^2 + 2",
+      "problem_type": "symbolic",
+      "difficulty": "challenging"
+    },
+    {
+      "id": "alg_05",
+      "category": "Algebra",
+      "family_id": "alg_rational_higher",
+      "problem": "Simplify the expression: (x^4 - 1) / (x^2 + 1)",
+      "reference": "x^2 - 1",
+      "problem_type": "symbolic",
+      "difficulty": "challenging"
+    },
+
+    {
+      "id": "eq_01",
+      "category": "Equations",
+      "family_id": "eq_quadratic_basic",
+      "problem": "Solve for the positive root of: x^2 - 5*x + 6 = 0",
+      "reference": "3",
+      "problem_type": "equation",
+      "metadata": {"variable": "x", "equation_lhs": "x^2 - 5*x + 6"},
+      "difficulty": "straightforward"
+    },
+    {
+      "id": "eq_02",
+      "category": "Equations",
+      "family_id": "eq_linear_rational",
+      "problem": "Solve for x: (2*x + 1) / 3 = 5",
+      "reference": "7",
+      "problem_type": "equation",
+      "metadata": {"variable": "x", "equation_lhs": "(2*x + 1)/3 - 5"},
+      "difficulty": "straightforward"
+    },
+    {
+      "id": "eq_03",
+      "category": "Equations",
+      "family_id": "eq_quadratic_irrational",
+      "problem": "Find the larger root of: x^2 - 2*x - 2 = 0",
+      "reference": "1 + sqrt(3)",
+      "problem_type": "equation",
+      "metadata": {"variable": "x", "equation_lhs": "x^2 - 2*x - 2"},
+      "difficulty": "challenging"
+    },
+    {
+      "id": "eq_04",
+      "category": "Equations",
+      "family_id": "eq_rational_singularity",
+      "problem": "Solve for x (checking domain restrictions): (x^2 - 4)/(x - 2) = 4",
+      "reference": "No solution",
+      "problem_type": "no_solution",
+      "metadata": {"variable": "x", "equation_lhs": "(x^2 - 4)/(x - 2) - 4", "domain_singularity": "x != 2", "extraneous_candidate": "2"},
+      "difficulty": "challenging"
+    },
+    {
+      "id": "eq_05",
+      "category": "Equations",
+      "family_id": "eq_radical_extraneous",
+      "problem": "Solve for real x: sqrt(2*x + 3) = -1",
+      "reference": "No solution",
+      "problem_type": "no_solution",
+      "metadata": {"variable": "x", "note": "Principal square root is non-negative", "extraneous_candidate": "-1"},
+      "difficulty": "challenging"
+    },
+    {
+      "id": "eq_06",
+      "category": "Equations",
+      "family_id": "eq_linear_system",
+      "problem": "Solve the system: 2*x + y = 7 and x - y = 2. What is the value of x?",
+      "reference": "3",
+      "problem_type": "exact",
+      "metadata": {"variable": "x", "system": ["2*x + y - 7", "x - y - 2"]},
+      "difficulty": "challenging"
+    },
+
+    {
+      "id": "calc_01",
+      "category": "Calculus",
+      "family_id": "calc_derivative_poly",
+      "problem": "Find the derivative with respect to x: d/dx (3*x^4 - 5*x^2 + 7)",
+      "reference": "12*x^3 - 10*x",
+      "problem_type": "symbolic",
+      "difficulty": "straightforward"
+    },
+    {
+      "id": "calc_02",
+      "category": "Calculus",
+      "family_id": "calc_def_integral",
+      "problem": "Evaluate the definite integral: \\int_0^2 (3*x^2 + 1) dx",
+      "reference": "10",
+      "problem_type": "exact",
+      "difficulty": "straightforward"
+    },
+    {
+      "id": "calc_03",
+      "category": "Calculus",
+      "family_id": "calc_indef_integral",
+      "problem": "Find the indefinite integral (antiderivative): \\int (2*x*cos(x^2)) dx",
+      "reference": "sin(x^2)",
+      "problem_type": "indefinite_integral",
+      "metadata": {"variable": "x", "integrand": "2*x*cos(x^2)"},
+      "difficulty": "challenging"
+    },
+    {
+      "id": "calc_04",
+      "category": "Calculus",
+      "family_id": "calc_limit_sinc",
+      "problem": "Evaluate the limit: \\lim_{x \\to 0} (sin(3*x) / x)",
+      "reference": "3",
+      "problem_type": "exact",
+      "difficulty": "challenging"
+    },
+    {
+      "id": "calc_05",
+      "category": "Calculus",
+      "family_id": "calc_product_rule",
+      "problem": "Find the derivative with respect to x: d/dx (x^2 * exp(x))",
+      "reference": "(x^2 + 2*x)*exp(x)",
+      "problem_type": "symbolic",
+      "difficulty": "challenging"
+    },
+
+    {
+      "id": "trig_01",
+      "category": "Trigonometry",
+      "family_id": "trig_pythagorean_identity",
+      "problem": "Simplify the trigonometric expression: sin(x)^2 + cos(x)^2 + tan(x)^2",
+      "reference": "sec(x)^2",
+      "problem_type": "symbolic",
+      "difficulty": "straightforward"
+    },
+    {
+      "id": "trig_02",
+      "category": "Trigonometry",
+      "family_id": "trig_exact_value",
+      "problem": "Compute the exact value: sin(pi / 6) + cos(pi / 3)",
+      "reference": "1",
+      "problem_type": "exact",
+      "difficulty": "straightforward"
+    },
+    {
+      "id": "trig_03",
+      "category": "Trigonometry",
+      "family_id": "trig_double_angle",
+      "problem": "Simplify using double angle formulas: 2*sin(x)*cos(x)",
+      "reference": "sin(2*x)",
+      "problem_type": "symbolic",
+      "difficulty": "challenging"
+    },
+    {
+      "id": "trig_04",
+      "category": "Trigonometry",
+      "family_id": "trig_impossible_distractor",
+      "problem": "Find all real solutions for x: sin(x) = 2",
+      "reference": "No solution",
+      "problem_type": "no_solution",
+      "metadata": {"note": "Range of sine on real numbers is [-1, 1]"},
+      "difficulty": "challenging"
+    },
+    {
+      "id": "trig_05",
+      "category": "Trigonometry",
+      "family_id": "trig_cos_double",
+      "problem": "Simplify: cos(x)^2 - sin(x)^2",
+      "reference": "cos(2*x)",
+      "problem_type": "symbolic",
+      "difficulty": "challenging"
+    },
+
+    {
+      "id": "log_01",
+      "category": "Logarithms_and_exponentials",
+      "family_id": "log_power_rule",
+      "problem": "Simplify: log(x^3) - log(x)",
+      "reference": "2*log(x)",
+      "problem_type": "symbolic",
+      "difficulty": "straightforward"
+    },
+    {
+      "id": "log_02",
+      "category": "Logarithms_and_exponentials",
+      "family_id": "log_exp_inverse",
+      "problem": "Evaluate: exp(log(5*x)) / x",
+      "reference": "5",
+      "problem_type": "exact",
+      "difficulty": "straightforward"
+    },
+    {
+      "id": "log_03",
+      "category": "Logarithms_and_exponentials",
+      "family_id": "log_quotient_rule",
+      "problem": "Simplify for a > 0, b > 0: log(a/b) + log(b/a)",
+      "reference": "0",
+      "problem_type": "exact",
+      "difficulty": "challenging"
+    },
+    {
+      "id": "log_04",
+      "category": "Logarithms_and_exponentials",
+      "family_id": "log_domain_distractor",
+      "problem": "Find real solutions for x: log(x - 3) = log(1 - x)",
+      "reference": "No solution",
+      "problem_type": "no_solution",
+      "metadata": {"note": "x > 3 and x < 1 have no overlap", "extraneous_candidate": "2"},
+      "difficulty": "challenging"
+    },
+    {
+      "id": "log_05",
+      "category": "Logarithms_and_exponentials",
+      "family_id": "log_exponential_solve",
+      "problem": "Solve for x: 2^(x + 1) = 16",
+      "reference": "3",
+      "problem_type": "exact",
+      "difficulty": "straightforward"
+    },
+
+    {
+      "id": "mat_01",
+      "category": "Matrices",
+      "family_id": "mat_det_2x2",
+      "problem": "Calculate the determinant of the 2x2 matrix [[3, 2], [1, 4]]",
+      "reference": "10",
+      "problem_type": "exact",
+      "difficulty": "straightforward"
+    },
+    {
+      "id": "mat_02",
+      "category": "Matrices",
+      "family_id": "mat_trace_2x2",
+      "problem": "Find the trace of the matrix [[5, -2], [3, 7]]",
+      "reference": "12",
+      "problem_type": "exact",
+      "difficulty": "straightforward"
+    },
+    {
+      "id": "mat_03",
+      "category": "Matrices",
+      "family_id": "mat_det_3x3_diag",
+      "problem": "Compute the determinant of the diagonal 3x3 matrix with diagonal entries 2, 3, -1",
+      "reference": "-6",
+      "problem_type": "exact",
+      "difficulty": "challenging"
+    },
+    {
+      "id": "mat_04",
+      "category": "Matrices",
+      "family_id": "mat_mult_entry",
+      "problem": "Given matrices A = [[1, 2], [0, 1]] and B = [[3, 0], [1, 2]], compute the top-left entry (row 1, col 1) of the product A * B",
+      "reference": "5",
+      "problem_type": "exact",
+      "difficulty": "challenging"
+    },
+    {
+      "id": "mat_05",
+      "category": "Matrices",
+      "family_id": "mat_eigenvalue_max",
+      "problem": "Find the larger eigenvalue of the 2x2 matrix [[2, 1], [1, 2]]",
+      "reference": "3",
+      "problem_type": "exact",
+      "difficulty": "challenging"
+    },
+
+    {
+      "id": "prob_01",
+      "category": "Probability",
+      "family_id": "prob_combination",
+      "problem": "Calculate the number of combinations: 5 choose 2",
+      "reference": "10",
+      "problem_type": "exact",
+      "difficulty": "straightforward"
+    },
+    {
+      "id": "prob_02",
+      "category": "Probability",
+      "family_id": "prob_coin_fair",
+      "problem": "What is the probability of getting exactly 2 heads in 3 fair coin tosses?",
+      "reference": "3/8",
+      "problem_type": "exact",
+      "difficulty": "straightforward"
+    },
+    {
+      "id": "prob_03",
+      "category": "Probability",
+      "family_id": "prob_permutation",
+      "problem": "Compute the number of permutations: P(6, 3)",
+      "reference": "120",
+      "problem_type": "exact",
+      "difficulty": "challenging"
+    },
+    {
+      "id": "prob_04",
+      "category": "Probability",
+      "family_id": "prob_dice_sum",
+      "problem": "What is the probability of rolling a sum of 7 when rolling two fair 6-sided dice?",
+      "reference": "1/6",
+      "problem_type": "exact",
+      "difficulty": "challenging"
+    },
+    {
+      "id": "prob_05",
+      "category": "Probability",
+      "family_id": "prob_cards_disjoint",
+      "problem": "What is the probability of randomly drawing either an Ace or a King from a standard 52-card deck?",
+      "reference": "2/13",
+      "problem_type": "exact",
+      "difficulty": "challenging"
+    },
+
+    {
+      "id": "latex_01",
+      "category": "LaTeX_ASCII_equivalence",
+      "family_id": "latex_ascii_frac",
+      "problem": "Evaluate the LaTeX expression: \\frac{3}{4} + \\frac{1}{2}",
+      "reference": "5/4",
+      "problem_type": "exact",
+      "difficulty": "straightforward"
+    },
+    {
+      "id": "latex_02",
+      "category": "LaTeX_ASCII_equivalence",
+      "family_id": "latex_ascii_sqrt_deriv",
+      "problem": "Compute the derivative: \\frac{d}{dx} \\sqrt{x}",
+      "reference": "1 / (2*sqrt(x))",
+      "problem_type": "symbolic",
+      "difficulty": "straightforward"
+    },
+    {
+      "id": "latex_03",
+      "category": "LaTeX_ASCII_equivalence",
+      "family_id": "latex_ascii_integral",
+      "problem": "Evaluate the LaTeX definite integral: \\int_0^1 x^3 dx",
+      "reference": "1/4",
+      "problem_type": "exact",
+      "difficulty": "challenging"
+    },
+    {
+      "id": "latex_04",
+      "category": "LaTeX_ASCII_equivalence",
+      "family_id": "latex_ascii_sum",
+      "problem": "Compute the sum: \\sum_{k=1}^4 k",
+      "reference": "10",
+      "problem_type": "exact",
+      "difficulty": "challenging"
+    },
+    {
+      "id": "latex_05",
+      "category": "LaTeX_ASCII_equivalence",
+      "family_id": "latex_ascii_limit",
+      "problem": "Evaluate the limit: \\lim_{x \\to \\infty} \\frac{2*x + 1}{x + 3}",
+      "reference": "2",
+      "problem_type": "exact",
+      "difficulty": "challenging"
+    }
+  ]
+}

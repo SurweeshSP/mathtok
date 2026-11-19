@@ -138,6 +138,7 @@ class MathTokPipeline:
         timeout_seconds: float = 5.0,
         max_depth: int = 20,
         emit_scope_tokens: bool = True,
+        optimize_tokens: bool = False,
     ) -> None:
         self.canon     = canonicalizer  or Canonicalizer(timeout_seconds=timeout_seconds)
         self.lexer     = lexer          or HybridLexer()
@@ -146,6 +147,7 @@ class MathTokPipeline:
         self.meta_gen  = metadata_gen   or MetadataGenerator()
         self.vocab     = vocab          or MathTokVocabulary()
         self.include_metadata = include_metadata
+        self.optimize_tokens  = optimize_tokens
 
     # ── Public API ────────────────────────────────────────────────────────
 
@@ -243,25 +245,59 @@ class MathTokPipeline:
             )
             return [error_tok], "[UNK]", canon_result, warnings
 
-        # Step 2: Build AST
-        try:
-            ast_root = self.ast_gen.generate(canon_result.expr)
-        except Exception as exc:
-            warnings.append(f"AST generation failed: {exc}")
-            error_tok = SerializedToken(
-                token="[UNK]", position=0, depth=0, node_id=-1,
-                parent_id=-1, child_index=0, num_children=0,
-                is_leaf=True, subtree_size=1,
-            )
-            return [error_tok], "[UNK]", canon_result, warnings
+        if self.optimize_tokens:
+            # Experimental Optimization via TokenOptimizer
+            target_tokenizer = None
+            try:
+                from .optimizer import TokenOptimizer
+                try:
+                    from transformers import GPT2Tokenizer
+                    target_tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
+                except Exception:
+                    target_tokenizer = None
 
-        # Step 3: Serialize to flat token stream
-        try:
-            ser_tokens = self.serializer.serialize(ast_root)
-            sexp       = self.serializer.to_sexp(ast_root)
-        except Exception as exc:
-            warnings.append(f"Serialization failed: {exc}")
-            return [], "", canon_result, warnings
+                optimizer = TokenOptimizer(tokenizer=target_tokenizer)
+                opt_result = optimizer.optimize(canon_result.expr)
+                optimized_rep = opt_result["optimized_representation"]
+                sexp = optimized_rep
+
+                tokens_str = optimized_rep.split()
+                ser_tokens = []
+                for i, tok in enumerate(tokens_str):
+                    ser_tokens.append(SerializedToken(
+                        token=tok, position=i, depth=0, node_id=i,
+                        parent_id=-1, child_index=0, num_children=0,
+                        is_leaf=True, subtree_size=1,
+                    ))
+            except Exception as exc:
+                warnings.append(f"Optimization failed: {exc}")
+                try:
+                    ast_root = self.ast_gen.generate(canon_result.expr)
+                    ser_tokens = self.serializer.serialize(ast_root)
+                    sexp = self.serializer.to_sexp(ast_root)
+                except Exception as exc2:
+                    warnings.append(f"Fallback Serialization failed: {exc2}")
+                    return [], "", canon_result, warnings
+        else:
+            # Step 2: Build AST (Standard pipeline)
+            try:
+                ast_root = self.ast_gen.generate(canon_result.expr)
+            except Exception as exc:
+                warnings.append(f"AST generation failed: {exc}")
+                error_tok = SerializedToken(
+                    token="[UNK]", position=0, depth=0, node_id=-1,
+                    parent_id=-1, child_index=0, num_children=0,
+                    is_leaf=True, subtree_size=1,
+                )
+                return [error_tok], "[UNK]", canon_result, warnings
+
+            # Step 3: Serialize to flat token stream
+            try:
+                ser_tokens = self.serializer.serialize(ast_root)
+                sexp       = self.serializer.to_sexp(ast_root)
+            except Exception as exc:
+                warnings.append(f"Serialization failed: {exc}")
+                return [], "", canon_result, warnings
 
         # Step 4: Dynamically register any new variable tokens
         for st in ser_tokens:

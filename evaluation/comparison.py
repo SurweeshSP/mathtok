@@ -75,6 +75,15 @@ else:
     _unified_data = {}
 
 UNIFIED_EXPRESSIONS = _unified_data.get("expressions", [])
+STANDARD_EXPRESSIONS = UNIFIED_EXPRESSIONS
+DEEP_NESTING_EXPRESSIONS = [
+    "sin(cos(tan(x)))",
+    "sin(cos((x+1)^2 + y^3))",
+    "exp(log(sqrt(x^2 + 1)))",
+    "((((x + 1) + 2) + 3) + 4)",
+    "sin(sin(sin(sin(x))))",
+    "((a+b)*(a-b))/((a+b)^2)",
+]
 CANONICAL_PAIRS = _unified_data.get("equivalent_pairs", [])
 MIXED_TEXT_MATH = _unified_data.get("mixed_text_math", [])
 

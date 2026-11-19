@@ -252,7 +252,12 @@ class HybridLexer:
             start -= 1
 
         # Expand forwards: follow balanced parens and math characters
-        depth = 0
+        # Initialize depth to net opening brackets in the seed
+        depth = (
+            text[start:end].count("(") - text[start:end].count(")") +
+            text[start:end].count("[") - text[start:end].count("]") +
+            text[start:end].count("{") - text[start:end].count("}")
+        )
         i = end
         while i < len(text):
             ch = text[i]
@@ -260,7 +265,7 @@ class HybridLexer:
                 depth += 1
                 i += 1
             elif ch in ")]}":
-                if depth == 0:
+                if depth <= 0:
                     break
                 depth -= 1
                 i += 1
